@@ -6,53 +6,96 @@ const {
   getTurnoById,
   createTurno,
   updateTurno,
-  deleteTurno
+  deleteTurno,
+  marcarAtendido,
+  estadisticasTurnos,
+  reportePDF
 } = require('../controllers/turnos.controller');
 
-const { body, param } = require('express-validator');
+const { validarTurno, validarId } = require('../middlewares/turnos.validator');
+const { validationResult } = require('express-validator');
+const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 
-// GET
-router.get('/turnos', getTurnos);
+//  Middleware valida errores
+const validarCampos = (req, res, next) => {
+  const errores = validationResult(req);
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() });
+  }
+  next();
+};
 
-// GET  ID
+// GET todos los turnos (usuario logueado)
 router.get(
-  '/turnos/:id',
-  param('id').isInt().withMessage('El ID debe ser un número'),
+  '/',
+  verifyToken,
+  getTurnos
+);
+
+// GET turno por ID
+router.get(
+  '/:id',
+  verifyToken,
+  validarId,
+  validarCampos,
   getTurnoById
 );
 
-// POST 
+// POST crear turno (admin / recepcionista)
 router.post(
-  '/turnos',
-  [
-    body('id_medico').isInt().withMessage('id_medico debe ser número'),
-    body('id_paciente').isInt().withMessage('id_paciente debe ser número'),
-    body('id_obra_social').isInt().withMessage('id_obra_social debe ser número'),
-    body('fecha_hora').notEmpty().withMessage('fecha_hora es obligatoria'),
-    body('valor_total').isDecimal().withMessage('valor_total debe ser decimal')
-  ],
+  '/',
+  verifyToken,
+  checkRole('admin', 'recepcionista'),
+  validarTurno,
+  validarCampos,
   createTurno
 );
 
-// PUT
+// PUT actualizar turno (admin)
 router.put(
-  '/turnos/:id',
-  [
-    param('id').isInt().withMessage('El ID debe ser número'),
-    body('id_medico').optional().isInt(),
-    body('id_paciente').optional().isInt(),
-    body('id_obra_social').optional().isInt(),
-    body('fecha_hora').optional().notEmpty(),
-    body('valor_total').optional().isDecimal()
-  ],
+  '/:id',
+  verifyToken,
+  checkRole('admin'),
+  validarId,
+  validarCampos,
   updateTurno
 );
 
-// DELETE
+//  DELETE lógico (admin)
 router.delete(
-  '/turnos/:id',
-  param('id').isInt().withMessage('El ID debe ser número'),
+  '/:id',
+  verifyToken,
+  checkRole('admin'),
+  validarId,
+  validarCampos,
   deleteTurno
+);
+
+// MARCAR COMO  ATENDIDO (médico)
+router.put(
+  '/atendido/:id',
+  verifyToken,
+  checkRole('medico'),
+  validarId,
+  validarCampos,
+  marcarAtendido
+);
+
+// ESTADÍSTICAS (admin)
+
+router.get(
+  '/estadisticas/resumen',
+  verifyToken,
+  checkRole('admin'),
+  estadisticasTurnos
+);
+
+// REPORTE PDF (admin)
+router.get(
+  '/reporte',
+  verifyToken,
+  checkRole('admin'),
+  reportePDF
 );
 
 module.exports = router;

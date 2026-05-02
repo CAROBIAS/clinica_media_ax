@@ -1,162 +1,129 @@
 const { pool } = require('../db/conexion');
 const { validationResult } = require('express-validator');
 
-// GET todos los turnos
+// GET 
 const getTurnos = async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      "SELECT * FROM turnos_reservas WHERE activo = 1"
-    );
-
-    res.json({
-      estado: "ok",
-      data: rows
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al obtener turnos" });
-  }
+  const [rows] = await pool.query(
+    "SELECT * FROM turnos_reservas WHERE activo = 1"
+  );
+  res.json(rows);
 };
 
-// GET turno por ID
+// GET por ID
 const getTurnoById = async (req, res) => {
-  try {
-    const errores = validationResult(req);
-    if (!errores.isEmpty()) {
-      return res.status(400).json({ errores: errores.array() });
-    }
+  const { id } = req.params;
 
-    const { id } = req.params;
+  const [rows] = await pool.query(
+    "SELECT * FROM turnos_reservas WHERE id_turno_reserva = ? AND activo = 1",
+    [id]
+  );
 
-    const [rows] = await pool.query(
-      "SELECT * FROM turnos_reservas WHERE id_turno_reserva = ? AND activo = 1",
-      [id]
-    );
-
-    if (rows.length === 0) {
-      return res.status(404).json({ mensaje: "Turno no encontrado" });
-    }
-
-    res.json({
-      estado: "ok",
-      data: rows[0]
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al obtener turno" });
+  if (!rows.length) {
+    return res.status(404).json({ msg: "No encontrado" });
   }
+
+  res.json(rows[0]);
 };
 
-// POST
+// CREATE
 const createTurno = async (req, res) => {
-  try {
-    const errores = validationResult(req);
-    if (!errores.isEmpty()) {
-      return res.status(400).json({ errores: errores.array() });
-    }
+  const {
+    id_medico,
+    id_paciente,
+    id_obra_social,
+    fecha_hora,
+    valor_total
+  } = req.body;
 
-    const {
-      id_medico,
-      id_paciente,
-      id_obra_social,
-      fecha_hora,
-      valor_total
-    } = req.body;
+  // VALIDAR FK médico
+  const [medico] = await pool.query(
+    "SELECT * FROM medicos WHERE id_medico = ? AND activo = 1",
+    [id_medico]
+  );
 
-    const [result] = await pool.query(
-      `INSERT INTO turnos_reservas 
-      (id_medico, id_paciente, id_obra_social, fecha_hora, valor_total, atendido, activo) 
-      VALUES (?, ?, ?, ?, ?, 0, 1)`,
-      [id_medico, id_paciente, id_obra_social, fecha_hora, valor_total]
-    );
-
-    res.status(201).json({
-      estado: "ok",
-      mensaje: "Turno creado",
-      id: result.insertId
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al crear turno" });
+  if (!medico.length) {
+    return res.status(400).json({ msg: "Médico inválido" });
   }
+
+  // VALIDAR FK paciente
+  const [paciente] = await pool.query(
+    "SELECT * FROM pacientes WHERE id_paciente = ? AND activo = 1",
+    [id_paciente]
+  );
+
+  if (!paciente.length) {
+    return res.status(400).json({ msg: "Paciente inválido" });
+  }
+
+  // DISPONIBILIDAD
+  const [ocupado] = await pool.query(
+    `SELECT * FROM turnos_reservas 
+     WHERE id_medico = ? AND fecha_hora = ? AND activo = 1`,
+    [id_medico, fecha_hora]
+  );
+
+  if (ocupado.length) {
+    return res.status(400).json({ msg: "Horario no disponible" });
+  }
+
+  // INSERT
+  const [result] = await pool.query(
+    `INSERT INTO turnos_reservas
+     (id_medico,id_paciente,id_obra_social,fecha_hora,valor_total,atendido,activo)
+     VALUES (?,?,?,?,?,0,1)`,
+    [id_medico, id_paciente, id_obra_social, fecha_hora, valor_total]
+  );
+
+  res.status(201).json({ id: result.insertId });
 };
 
-// PUT
+// UPDATE
 const updateTurno = async (req, res) => {
-  try {
-    const errores = validationResult(req);
-    if (!errores.isEmpty()) {
-      return res.status(400).json({ errores: errores.array() });
-    }
+  const { id } = req.params;
+  const { fecha_hora } = req.body;
 
-    const { id } = req.params;
+  await pool.query(
+    "UPDATE turnos_reservas SET fecha_hora=? WHERE id_turno_reserva=?",
+    [fecha_hora, id]
+  );
 
-    const {
-      id_medico,
-      id_paciente,
-      id_obra_social,
-      fecha_hora,
-      valor_total,
-      atendido
-    } = req.body;
-
-    const [result] = await pool.query(
-      `UPDATE turnos_reservas 
-       SET id_medico = ?, id_paciente = ?, id_obra_social = ?, 
-           fecha_hora = ?, valor_total = ?, atendido = ?
-       WHERE id_turno_reserva = ? AND activo = 1`,
-      [
-        id_medico,
-        id_paciente,
-        id_obra_social,
-        fecha_hora,
-        valor_total,
-        atendido,
-        id
-      ]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ mensaje: "Turno no encontrado" });
-    }
-
-    res.json({
-      estado: "ok",
-      mensaje: "Turno actualizado"
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al actualizar turno" });
-  }
+  res.json({ msg: "Actualizado" });
 };
 
 // DELETE 
 const deleteTurno = async (req, res) => {
-  try {
-    const errores = validationResult(req);
-    if (!errores.isEmpty()) {
-      return res.status(400).json({ errores: errores.array() });
-    }
+  const { id } = req.params;
 
-    const { id } = req.params;
+  await pool.query(
+    "UPDATE turnos_reservas SET activo=0 WHERE id_turno_reserva=?",
+    [id]
+  );
 
-    const [result] = await pool.query(
-      "UPDATE turnos_reservas SET activo = 0 WHERE id_turno_reserva = ?",
-      [id]
-    );
+  res.json({ msg: "Eliminado" });
+};
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ mensaje: "Turno no encontrado" });
-    }
+// MARCAR ATENDIDO
+const marcarAtendido = async (req, res) => {
+  const { id } = req.params;
 
-    res.json({
-      estado: "ok",
-      mensaje: "Turno eliminado (borrado lógico)"
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error al eliminar turno" });
-  }
+  await pool.query(
+    "UPDATE turnos_reservas SET atendido=1 WHERE id_turno_reserva=?",
+    [id]
+  );
+
+  res.json({ msg: "Atendido" });
+};
+
+// STORED PROCEDURE
+const estadisticasTurnos = async (req, res) => {
+  const [rows] = await pool.query("CALL especialidades_x_turnos()");
+  res.json(rows[0]);
+};
+
+// VIEW 
+const reportePDF = async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM v_pacientes");
+  res.json(rows);
 };
 
 module.exports = {
@@ -164,5 +131,8 @@ module.exports = {
   getTurnoById,
   createTurno,
   updateTurno,
-  deleteTurno
+  deleteTurno,
+  marcarAtendido,
+  estadisticasTurnos,
+  reportePDF
 };

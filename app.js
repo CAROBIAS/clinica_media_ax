@@ -1,11 +1,14 @@
-// app.js
 require('dotenv').config();
-const express      = require('express');
-const cors         = require('cors');
-const morgan       = require('morgan');
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+
 const { testConnection } = require('./src/config/db');
-const errorHandler    = require('./src/middlewares/errorHandler');
-const swaggerSetup    = require('./src/config/swagger');
+const errorHandler = require('./src/middlewares/errorHandler');
+const swaggerSetup = require('./src/config/swagger');
+
+//  IMPORTAR RUTAS DE TURNOS
+const turnosRoutes = require('./src/routes/turnos.routes');
 
 const app = express();
 
@@ -16,13 +19,17 @@ app.use(morgan('dev'));
 
 swaggerSetup(app);
 
+//  RUTAS DE TURNOS
+app.use('/turnos', turnosRoutes);
+
 app.get('/', (req, res) => {
   res.json({
-    ok:      true,
+    ok: true,
     message: 'API Clinica Medica AX funcionando',
-    docs:    'http://localhost:3000/api-docs'
+    docs: 'http://localhost:3000/api-docs'
   });
 });
+
 
 app.use(errorHandler);
 
@@ -31,7 +38,7 @@ const PORT = process.env.PORT || 3000;
 async function start() {
   await testConnection();
   app.listen(PORT, () => {
-    console.log(`🚀 Servidor en http://localhost:${PORT}`);
+    console.log(` Servidor en http://localhost:${PORT}`);
   });
 }
 

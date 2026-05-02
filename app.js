@@ -43,11 +43,14 @@ app.get('/api/perfil', authMiddleware, (req, res) => {
 });
 // ==================================================
 
-// Middleware de manejo de errores (siempre al final, antes del listen)
-app.use(errorHandler);
+
 // Monta las rutas de especialidades y médicos con el prefijo /api
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/medicos', medicoRoutes);
+app.use('/api/auth', authRoutes);
+
+// Middleware de manejo de errores (siempre al final, antes del listen)
+app.use(errorHandler);
 
 // Puerto y arranque
 const PORT = process.env.PORT || 3000;

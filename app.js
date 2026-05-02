@@ -5,6 +5,8 @@ const cors         = require('cors');
 const morgan       = require('morgan');
 const { testConnection } = require('./src/config/db');
 const errorHandler    = require('./src/middlewares/errorHandler');
+const especialidadRoutes = require('./src/routes/especialidad.routes');
+const medicoRoutes = require('./src/routes/medico.routes');
 const swaggerSetup    = require('./src/config/swagger');
 
 const app = express();
@@ -24,6 +26,9 @@ app.get('/', (req, res) => {
   });
 });
 
+// Monta las rutas de especialidades y médicos con el prefijo /api
+app.use('/api/especialidades', especialidadRoutes);
+app.use('/api/medicos', medicoRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;

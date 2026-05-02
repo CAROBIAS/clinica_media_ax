@@ -8,6 +8,10 @@ const errorHandler = require('./src/middlewares/errorHandler');
 const swaggerSetup = require('./src/config/swagger');
 const authRoutes = require('./src/routes/authRoutes');  
 console.log('authRoutes:', authRoutes);  // debe mostrar un objeto router        // ← 1. Importar rutas de auth
+const errorHandler    = require('./src/middlewares/errorHandler');
+const especialidadRoutes = require('./src/routes/especialidad.routes');
+const medicoRoutes = require('./src/routes/medico.routes');
+const swaggerSetup    = require('./src/config/swagger');
 
 const app = express();
 
@@ -42,6 +46,9 @@ app.get('/api/perfil', authMiddleware, (req, res) => {
 // ==================================================
 
 // Middleware de manejo de errores (siempre al final, antes del listen)
+// Monta las rutas de especialidades y médicos con el prefijo /api
+app.use('/api/especialidades', especialidadRoutes);
+app.use('/api/medicos', medicoRoutes);
 app.use(errorHandler);
 
 // Puerto y arranque

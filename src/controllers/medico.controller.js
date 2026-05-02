@@ -31,7 +31,7 @@ class MedicoController {
   // Crea nuevo medico
   async create(req, res, next) {
     try {
-      const data = await service.create(req.body);
+      const data = await service.create(req.dto);
       return created(res, data);
     } catch (error) {
       next(error);
@@ -42,7 +42,7 @@ class MedicoController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const data = await service.update(id, req.body);
+      const data = await service.update(id, req.dto);
       return ok(res, data);
     } catch (error) {
       next(error);

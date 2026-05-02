@@ -1,4 +1,4 @@
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 const { validationResult } = require('express-validator');
 const { pool } = require('../../config/db');
 
@@ -13,8 +13,8 @@ const validateResult = (req, res, next) => {
 
 // Validación para creación de médico, con validación de existencia y estado de especialidad
 const createValidation = [
-  body('id_usuario').isInt({ min: 1 }).withMessage('Usuario inválido'),
-  body('id_especialidad')
+  body('idUsuario').isInt({ min: 1 }).withMessage('Usuario inválido'),
+  body('idEspecialidad')
     .isInt({ min: 1 })
     .withMessage('Especialidad inválida')
     .custom(async (value) => {
@@ -23,7 +23,7 @@ const createValidation = [
       return true;
     }),
   body('matricula').isInt({ min: 1 }).withMessage('Matrícula inválida'),
-  body('valor_consulta').isDecimal({ decimal_digits: '0,2' }).withMessage('Valor inválido'),
+  body('valorConsulta').isDecimal({ decimal_digits: '0,2' }).withMessage('Valor inválido'),
   body('descripcion').optional().isString(),
   validateResult
 ];
@@ -31,8 +31,8 @@ const createValidation = [
 // Validación para actualización de médico, con validación de existencia y estado de especialidad
 const updateValidation = [
   param('id').isInt({ min: 1 }).withMessage('ID inválido'),
-  body('id_usuario').optional().isInt({ min: 1 }).withMessage('Usuario inválido'),
-  body('id_especialidad')
+  body('idUsuario').optional().isInt({ min: 1 }).withMessage('Usuario inválido'),
+  body('idEspecialidad')
     .optional()
     .isInt({ min: 1 })
     .withMessage('Especialidad inválida')
@@ -42,7 +42,7 @@ const updateValidation = [
       return true;
     }),
   body('matricula').optional().isInt({ min: 1 }).withMessage('Matrícula inválida'),
-  body('valor_consulta').optional().isDecimal({ decimal_digits: '0,2' }).withMessage('Valor inválido'),
+  body('valorConsulta').optional().isDecimal({ decimal_digits: '0,2' }).withMessage('Valor inválido'),
   body('descripcion').optional().isString(),
   validateResult
 ];

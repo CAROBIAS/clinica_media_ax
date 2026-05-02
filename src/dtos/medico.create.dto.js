@@ -1,11 +1,11 @@
 // DTO para creación de médico, con validación de campos necesarios
 class MedicoCreateDTO {
-  constructor(body) {
-    this.id_usuario = body.id_usuario;
-    this.id_especialidad = body.id_especialidad;
-    this.matricula = body.matricula;
-    this.descripcion = body.descripcion || null;
-    this.valor_consulta = body.valor_consulta;
+  constructor({ idUsuario, idEspecialidad, matricula, valorConsulta, descripcion }) {
+    this.id_usuario = idUsuario;
+    this.id_especialidad = idEspecialidad;
+    this.matricula = matricula;
+    this.valor_consulta = valorConsulta;
+    this.descripcion = descripcion || null;
   }
 }
 

@@ -1,38 +1,20 @@
-// app.js
-require('dotenv').config();
-const express      = require('express');
-const cors         = require('cors');
-const morgan       = require('morgan');
-const { testConnection } = require('./src/config/db');
-const errorHandler    = require('./src/middlewares/errorHandler');
-const swaggerSetup    = require('./src/config/swagger');
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+
+import obrasRoutes from "./routes/obrasSociales.routes.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(cors());
+app.use(morgan("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
 
-swaggerSetup(app);
-
-app.get('/', (req, res) => {
-  res.json({
-    ok:      true,
-    message: 'API Clinica Medica AX funcionando',
-    docs:    'http://localhost:3000/api-docs'
-  });
-});
+app.use("/api", obrasRoutes);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
-
-async function start() {
-  await testConnection();
-  app.listen(PORT, () => {
-    console.log(`🚀 Servidor en http://localhost:${PORT}`);
-  });
-}
-
-start();
+app.listen(3000, () => {
+  console.log("Servidor corriendo en puerto 3000");
+});

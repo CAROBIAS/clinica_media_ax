@@ -1,12 +1,7 @@
 {
-  "name": "clinica-medica-ax",
+  "name": "api-obras-sociales",
   "version": "1.0.0",
-  "description": "TFI Programacion III - UNER 2026",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
-  },
+  "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",

@@ -6,9 +6,8 @@ import morgan from 'morgan';
 
 // Configuraciones y middlewares globales
 import { testConnection } from './src/config/db.js';
-// Asumo que errorHandler se exporta por defecto (export default). Si falla, probá con: import { errorHandler } from ...
 import errorHandler from './src/middlewares/errorHandler.js'; 
-// import swaggerSetup from './src/config/swagger.js';
+import swaggerSetup from './src/config/swagger.js';
 import { authMiddleware } from './src/middlewares/authMiddleware.js';
 
 // ==================================================
@@ -17,9 +16,9 @@ import { authMiddleware } from './src/middlewares/authMiddleware.js';
 import authRoutes from './src/routes/authRoutes.js';
 import especialidadRoutes from './src/routes/especialidad.routes.js';
 import medicoRoutes from './src/routes/medico.routes.js';
-
-// Rutas de Walter (asumiendo que están dentro de src/)
 import obrasRoutes from './src/routes/obrasSociales.routes.js'; 
+// Nueva ruta de Braian
+import turnosRoutes from './src/routes/turnos.routes.js';
 
 const app = express();
 
@@ -31,12 +30,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Ruta pública de prueba
+// Configuración de Swagger (Traído de la rama de Braian)
+swaggerSetup(app);
+
+// Ruta pública de prueba unificada
 app.get('/', (req, res) => {
   res.json({
     ok: true,
-    message: 'API Clinica Medica AX funcionando',
-    docs: 'http://localhost:3000/api-docs'
+    message: 'API Clínica Médica AX funcionando',
+    endpoints: {
+      auth: '/api/auth',
+      turnos: '/api/turnos',
+      especialidades: '/api/especialidades',
+      medicos: '/api/medicos',
+      docs: '/api-docs'
+    }
   });
 });
 
@@ -46,17 +54,18 @@ app.get('/', (req, res) => {
 // Autenticación
 app.use('/api/auth', authRoutes);
 
-// (OPCIONAL) Ruta protegida de ejemplo para probar el middleware
+// Perfil (protegido)
 app.get('/api/perfil', authMiddleware, (req, res) => {
   res.json({ mensaje: 'Acceso permitido', usuario: req.user });
 });
 
-// Entidades
+// Entidades principales
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/medicos', medicoRoutes);
+app.use('/api/turnos', turnosRoutes); // Montada según Braian
 app.use('/api', obrasRoutes);
 
-// Middleware de manejo de errores (siempre al final, antes del listen)
+// Middleware de manejo de errores (SIEMPRE al final)
 app.use(errorHandler);
 
 // ==================================================
@@ -69,9 +78,10 @@ async function start() {
     await testConnection();
     app.listen(PORT, () => {
       console.log(`🚀 Servidor en http://localhost:${PORT}`);
+      console.log(`📄 Swagger en http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    console.error('Error al iniciar el servidor:', error);
+    console.error('❌ Error al iniciar el servidor:', error);
   }
 }
 

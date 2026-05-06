@@ -1,7 +1,5 @@
-const EspecialidadService = require('../services/especialidad.service');
+const service = require('../services/especialidad.service');
 const { ok, created, notFound } = require('../utils/response');
-
-const service = new EspecialidadService();
 
 // Recibe la petición, llama al servicio y da formato de respuesta usando el helper response
 class EspecialidadController {

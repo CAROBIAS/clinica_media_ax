@@ -1,7 +1,5 @@
-const MedicoService = require('../services/medico.service');
+const service = require('../services/medico.service');
 const { ok, created, notFound } = require('../utils/response');
-
-const service = new MedicoService();
 
 // Recibe la petición, llama al servicio y da formato de respuesta usando el helper response, recibe filtros por query en getAll
 class MedicoController {

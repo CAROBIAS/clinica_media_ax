@@ -1,14 +1,13 @@
-// src/config/swagger.js
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi   = require('swagger-ui-express');
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title:       'API Clinica Medica AX',
+      title:       'API Clínica Médica AX',
       version:     '1.0.0',
-      description: 'TFI Programacion III - UNER 2026',
+      description: 'TFI Programación III - UNER 2026',
     },
     servers: [{ url: `http://localhost:${process.env.PORT || 3000}` }],
     components: {
@@ -21,8 +20,8 @@ const options = {
   apis: ['./src/routes/*.js'],
 };
 
-module.exports = (app) => {
+export default function swaggerSetup(app) {
   const spec = swaggerJsdoc(options);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
-  console.log('📄 Swagger en http://localhost:3000/api-docs');
-};
+  console.log('Swagger en http://localhost:3000/api-docs');
+}

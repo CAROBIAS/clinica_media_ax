@@ -1,8 +1,6 @@
-// src/middlewares/authMiddleware.js
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const authMiddleware = (req, res, next) => {
-  // Obtener token del header Authorization
+export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Token no proporcionado' });
@@ -12,15 +10,14 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;   // adjuntar información del usuario a la request
+    req.user = decoded;   
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Token inválido o expirado' });
   }
 };
 
-// Middleware para verificar roles específicos
-const authorize = (...roles) => {
+export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) return res.status(401).json({ error: 'No autenticado' });
     if (!roles.includes(req.user.rol)) {
@@ -30,4 +27,6 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { authMiddleware, authorize };
+
+export const verifyToken = authMiddleware;
+export const checkRole = authorize;

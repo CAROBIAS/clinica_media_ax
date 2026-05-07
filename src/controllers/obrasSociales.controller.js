@@ -1,10 +1,8 @@
-import { pool } from "../db.js";
+import { pool } from "../config/db.js";
 import { calcularTotal } from "../services/calculo.service.js";
 
 export const getObras = async (req, res) => {
-  const [rows] = await pool.query(
-    "SELECT * FROM obras_sociales WHERE activo = 1"
-  );
+  const [rows] = await pool.query("SELECT * FROM obras_sociales WHERE activo = 1");
   res.json(rows);
 };
 
@@ -12,7 +10,7 @@ export const createObra = async (req, res) => {
   const { nombre, descuento } = req.body;
 
   const [result] = await pool.query(
-    "INSERT INTO obras_sociales (nombre, descuento, activo) VALUES (?, ?, 1)",
+    "INSERT INTO obras_sociales (nombre, porcentaje_descuento, activo) VALUES (?, ?, 1)",
     [nombre, descuento]
   );
 
@@ -24,7 +22,7 @@ export const updateObra = async (req, res) => {
   const { nombre, descuento } = req.body;
 
   await pool.query(
-    "UPDATE obras_sociales SET nombre=?, descuento=? WHERE id=?",
+    "UPDATE obras_sociales SET nombre=?, porcentaje_descuento=? WHERE id_obra_social=?",
     [nombre, descuento, id]
   );
 
@@ -35,7 +33,7 @@ export const deleteObra = async (req, res) => {
   const { id } = req.params;
 
   await pool.query(
-    "UPDATE obras_sociales SET activo = 0 WHERE id = ?",
+    "UPDATE obras_sociales SET activo = 0 WHERE id_obra_social = ?",
     [id]
   );
 
@@ -51,14 +49,11 @@ export const asignarObrasAMedico = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    await conn.query(
-      "DELETE FROM medicos_obras_sociales WHERE medico_id = ?",
-      [id]
-    );
+    await conn.query("DELETE FROM medicos_obras_sociales WHERE id_medico = ?", [id]);
 
     for (let os of obras_sociales) {
       const [obra] = await conn.query(
-        "SELECT * FROM obras_sociales WHERE id = ? AND activo = 1",
+        "SELECT * FROM obras_sociales WHERE id_obra_social = ? AND activo = 1",
         [os]
       );
 
@@ -67,7 +62,7 @@ export const asignarObrasAMedico = async (req, res) => {
       }
 
       await conn.query(
-        "INSERT INTO medicos_obras_sociales (medico_id, obra_social_id) VALUES (?, ?)",
+        "INSERT INTO medicos_obras_sociales (id_medico, id_obra_social) VALUES (?, ?)",
         [id, os]
       );
     }
@@ -88,10 +83,10 @@ export const validarCalculoTurno = async (req, res) => {
   const { turno_id } = req.params;
 
   const [rows] = await pool.query(`
-    SELECT t.precio_base, o.descuento, t.valor_total
+    SELECT t.valor_total as precio_base, o.porcentaje_descuento as descuento, t.valor_total
     FROM turnos_reservas t
-    JOIN obras_sociales o ON t.obra_social_id = o.id
-    WHERE t.id = ?
+    JOIN obras_sociales o ON t.id_obra_social = o.id_obra_social
+    WHERE t.id_turno_reserva = ?
   `, [turno_id]);
 
   if (rows.length === 0) {
@@ -99,7 +94,6 @@ export const validarCalculoTurno = async (req, res) => {
   }
 
   const { precio_base, descuento, valor_total } = rows[0];
-
   const calculado = calcularTotal(precio_base, descuento);
 
   if (calculado !== valor_total) {
@@ -110,8 +104,5 @@ export const validarCalculoTurno = async (req, res) => {
     });
   }
 
-  res.json({
-    ok: true,
-    mensaje: "Cálculo correcto"
-  });
+  res.json({ ok: true, mensaje: "Cálculo correcto" });
 };

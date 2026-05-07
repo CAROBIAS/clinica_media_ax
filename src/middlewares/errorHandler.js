@@ -1,4 +1,3 @@
-// src/middlewares/errorHandler.js
 const errorHandler = (err, req, res, next) => {
   console.error('[ERROR]', err.message);
   const status = err.statusCode || 500;
@@ -10,4 +9,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

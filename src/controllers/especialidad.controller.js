@@ -1,9 +1,7 @@
-const service = require('../services/especialidad.service');
-const { ok, created, notFound } = require('../utils/response');
+import service from '../services/especialidad.service.js';
+import { ok, created, notFound } from '../utils/response.js';
 
-// Recibe la petición, llama al servicio y da formato de respuesta usando el helper response
 class EspecialidadController {
-  // Obtiene todas las epecialidades activas
   async getAll(req, res, next) {
     try {
       const data = await service.findAll();
@@ -13,7 +11,6 @@ class EspecialidadController {
     }
   }
 
-  // Obtiene especialidad por id
   async getById(req, res, next) {
     try {
       const { id } = req.params;
@@ -25,7 +22,6 @@ class EspecialidadController {
     }
   }
 
-  // Crea nueva especialidad
   async create(req, res, next) {
     try {
       const { nombre } = req.body;
@@ -36,7 +32,6 @@ class EspecialidadController {
     }
   }
 
-  // Actualiza especialidad por id
   async update(req, res, next) {
     try {
       const { id } = req.params;
@@ -48,7 +43,6 @@ class EspecialidadController {
     }
   }
 
-  // Elimina especialidad por id (soft delete)
   async delete(req, res, next) {
     try {
       const { id } = req.params;
@@ -60,4 +54,4 @@ class EspecialidadController {
   }
 }
 
-module.exports = new EspecialidadController();
+export default new EspecialidadController();

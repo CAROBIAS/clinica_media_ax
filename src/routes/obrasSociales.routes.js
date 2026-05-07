@@ -10,6 +10,25 @@ import {
 
 const router = Router();
 
+/**
+ * @swagger
+ * /api/obras-sociales:
+ *   get:
+ *     summary: Obtener todas las obras sociales activas
+ *     tags: [Obras Sociales]
+ *     responses:
+ *       200:
+ *         description: Lista de obras sociales
+ *   post:
+ *     summary: Crear nueva obra social
+ *     tags: [Obras Sociales]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Obra social creada
+ */
+
 router.get("/obras-sociales", getObras);
 router.post("/obras-sociales", createObra);
 router.put("/obras-sociales/:id", updateObra);

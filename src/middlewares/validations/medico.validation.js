@@ -1,8 +1,6 @@
-const { body, param } = require('express-validator');
-const { validationResult } = require('express-validator');
-const { pool } = require('../../config/db');
+import { body, param, validationResult } from 'express-validator';
+import { pool } from '../../config/db.js';
 
-// Middleware que junta errores y responde 400 si hay
 const validateResult = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -11,8 +9,7 @@ const validateResult = (req, res, next) => {
   next();
 };
 
-// Validación para creación de médico, con validación de existencia y estado de especialidad
-const createValidation = [
+export const createValidation = [
   body('idUsuario').isInt({ min: 1 }).withMessage('Usuario inválido'),
   body('idEspecialidad')
     .isInt({ min: 1 })
@@ -28,8 +25,7 @@ const createValidation = [
   validateResult
 ];
 
-// Validación para actualización de médico, con validación de existencia y estado de especialidad
-const updateValidation = [
+export const updateValidation = [
   param('id').isInt({ min: 1 }).withMessage('ID inválido'),
   body('idUsuario').optional().isInt({ min: 1 }).withMessage('Usuario inválido'),
   body('idEspecialidad')
@@ -47,10 +43,7 @@ const updateValidation = [
   validateResult
 ];
 
-// Validación para ID de médico
-const idValidation = [
+export const idValidation = [
   param('id').isInt({ min: 1 }).withMessage('ID inválido'),
   validateResult
 ];
-
-module.exports = { createValidation, updateValidation, idValidation };

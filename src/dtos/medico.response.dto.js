@@ -1,5 +1,4 @@
-// Cambia la fila de la base de datos a un objeto con nombres mas claros
-class MedicoResponseDTO {
+export default class MedicoResponseDTO {
   constructor(row) {
     this.idMedico = row.id_medico;
     this.idUsuario = row.id_usuario;
@@ -14,5 +13,3 @@ class MedicoResponseDTO {
     this.nombreEspecialidad = row.nombre_especialidad;
   }
 }
-
-module.exports = MedicoResponseDTO;

@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+import { pool } from '../config/db.js';
 
 class EspecialidadModel {
   async findAll() {
@@ -66,4 +66,4 @@ class EspecialidadModel {
   }
 }
 
-module.exports = EspecialidadModel;
+export default EspecialidadModel;

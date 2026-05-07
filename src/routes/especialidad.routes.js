@@ -1,20 +1,36 @@
-const express = require('express');
-const router = express.Router();
-const especialidadController = require('../controllers/especialidad.controller');
-const { authMiddleware, authorize } = require('../middlewares/authMiddleware');
-const {
+import express from 'express';
+import especialidadController from '../controllers/especialidad.controller.js';
+import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
+import {
   crearEspecialidadValidation,
   actualizarEspecialidadValidation,
   idEspecialidadValidation
-} = require('../middlewares/validations/especialidad.validation');
+} from '../middlewares/validations/especialidad.validation.js';
 
-// Rutas públicas (solo lectura)
+const router = express.Router();
+
+/**
+ * @swagger
+ * /api/especialidades:
+ *   get:
+ *     summary: Obtener todas las especialidades activas
+ *     tags: [Especialidades]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de especialidades
+ *       401:
+ *         description: No autorizado
+ */
+
+
 router.get('/', especialidadController.getAll);
 router.get('/:id', idEspecialidadValidation, especialidadController.getById);
 
-// Rutas protegidas solo para administradores (rol 3)
+
 router.post('/', authMiddleware, authorize(3), crearEspecialidadValidation, especialidadController.create);
 router.put('/:id', authMiddleware, authorize(3), actualizarEspecialidadValidation, especialidadController.update);
 router.delete('/:id', authMiddleware, authorize(3), idEspecialidadValidation, especialidadController.delete);
 
-module.exports = router;
+export default router;

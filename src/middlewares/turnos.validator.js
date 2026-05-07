@@ -1,7 +1,6 @@
-const { body, param } = require('express-validator');
+import { body, param } from 'express-validator';
 
-//  VALIDAR PARA CREAR TURNO
-const validarTurno = [
+export const validarTurno = [
   body('id_medico')
     .notEmpty().withMessage('id_medico es obligatorio')
     .isInt().withMessage('id_medico debe ser número'),
@@ -23,14 +22,8 @@ const validarTurno = [
     .isDecimal().withMessage('valor_total debe ser decimal')
 ];
 
-// VALIDAR ID  
-const validarId = [
+export const validarId = [
   param('id')
     .notEmpty().withMessage('ID requerido')
     .isInt().withMessage('El ID debe ser un número')
 ];
-
-module.exports = {
-  validarTurno,
-  validarId
-};

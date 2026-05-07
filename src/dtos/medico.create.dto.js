@@ -1,5 +1,4 @@
-// DTO para creación de médico, con validación de campos necesarios
-class MedicoCreateDTO {
+export default class MedicoCreateDTO {
   constructor({ idUsuario, idEspecialidad, matricula, valorConsulta, descripcion }) {
     this.id_usuario = idUsuario;
     this.id_especialidad = idEspecialidad;
@@ -8,5 +7,3 @@ class MedicoCreateDTO {
     this.descripcion = descripcion || null;
   }
 }
-
-module.exports = MedicoCreateDTO;

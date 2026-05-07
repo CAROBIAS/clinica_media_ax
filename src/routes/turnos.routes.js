@@ -1,7 +1,5 @@
-const express = require('express');
-const router = express.Router();
-
-const {
+import express from 'express';
+import {
   getTurnos,
   getTurnoById,
   createTurno,
@@ -10,13 +8,14 @@ const {
   marcarAtendido,
   estadisticasTurnos,
   reportePDF
-} = require('../controllers/turnos.controller');
+} from '../controllers/turnos.controller.js';
 
-const { validarTurno, validarId } = require('../middlewares/turnos.validator');
-const { validationResult } = require('express-validator');
-const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
+import { validarTurno, validarId } from '../middlewares/turnos.validator.js';
+import { validationResult } from 'express-validator';
+import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
 
-//  Middleware valida errores
+const router = express.Router();
+
 const validarCampos = (req, res, next) => {
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
@@ -25,77 +24,61 @@ const validarCampos = (req, res, next) => {
   next();
 };
 
-// GET todos los turnos (usuario logueado)
-router.get(
-  '/',
-  verifyToken,
-  getTurnos
-);
+/**
+ * @swagger
+ * /api/turnos:
+ *   get:
+ *     summary: Obtener todos los turnos activos
+ *     tags: [Turnos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de turnos
+ *       401:
+ *         description: No autorizado
+ */
 
-// GET turno por ID
-router.get(
-  '/:id',
-  verifyToken,
-  validarId,
-  validarCampos,
-  getTurnoById
-);
 
-// POST crear turno (admin / recepcionista)
-router.post(
-  '/',
-  verifyToken,
-  checkRole('admin', 'recepcionista'),
-  validarTurno,
-  validarCampos,
-  createTurno
-);
+router.get('/', authMiddleware, getTurnos);
 
-// PUT actualizar turno (admin)
-router.put(
-  '/:id',
-  verifyToken,
-  checkRole('admin'),
-  validarId,
-  validarCampos,
-  updateTurno
-);
 
-//  DELETE lógico (admin)
-router.delete(
-  '/:id',
-  verifyToken,
-  checkRole('admin'),
-  validarId,
-  validarCampos,
-  deleteTurno
-);
+router.get('/:id', authMiddleware, validarId, validarCampos, getTurnoById);
 
-// MARCAR COMO  ATENDIDO (médico)
-router.put(
-  '/atendido/:id',
-  verifyToken,
-  checkRole('medico'),
-  validarId,
-  validarCampos,
-  marcarAtendido
-);
 
-// ESTADÍSTICAS (admin)
+router.post('/', authMiddleware, authorize(2, 3), validarTurno, validarCampos, createTurno);
 
-router.get(
-  '/estadisticas/resumen',
-  verifyToken,
-  checkRole('admin'),
-  estadisticasTurnos
-);
 
-// REPORTE PDF (admin)
-router.get(
-  '/reporte',
-  verifyToken,
-  checkRole('admin'),
-  reportePDF
-);
+router.put('/:id', authMiddleware, authorize(3), validarId, validarCampos, updateTurno);
 
-module.exports = router;
+
+router.delete('/:id', authMiddleware, authorize(3), validarId, validarCampos, deleteTurno);
+
+
+router.put('/atendido/:id', authMiddleware, authorize(1), validarId, validarCampos, marcarAtendido);
+
+
+router.get('/estadisticas/resumen', authMiddleware, authorize(3), estadisticasTurnos);
+
+
+/**
+ * @swagger
+ * /api/turnos/reporte/estadisticas:
+ *   get:
+ *     summary: Descargar reporte PDF con estadísticas de la clínica
+ *     tags: [Turnos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Archivo PDF generado
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+
+router.get('/reporte/estadisticas', authMiddleware, authorize(3), reportePDF);
+
+export default router;

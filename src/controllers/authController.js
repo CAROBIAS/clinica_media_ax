@@ -1,20 +1,19 @@
-const { pool } = require('../config/db');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
+import { pool } from '../config/db.js';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 const hashPassword = (password) => {
   return crypto.createHash('sha256').update(password).digest('hex');
 };
 
-const login = async (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email y contraseña son requeridos' });
     }
-
-    // ✅ CORREGIDO: Usar pool.query en lugar de db.query
+    
     const [rows] = await pool.query(
       'SELECT id_usuario, email, contrasenia, rol FROM usuarios WHERE email = ? AND activo = 1',
       [email]
@@ -46,5 +45,3 @@ const login = async (req, res, next) => {
     next(error);
   }
 };
-
-module.exports = { login };

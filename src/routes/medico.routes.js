@@ -1,21 +1,41 @@
-const express = require('express');
-const router = express.Router();
-const medicoController = require('../controllers/medico.controller');
-const { authMiddleware, authorize } = require('../middlewares/authMiddleware');
-const {
+import express from 'express';
+import medicoController from '../controllers/medico.controller.js';
+import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
+import {
   createValidation,
   updateValidation,
   idValidation
-} = require('../middlewares/validations/medico.validation');
-const { transformToMedicoDTO } = require('../middlewares/transform.dto');
+} from '../middlewares/validations/medico.validation.js';
+import { transformToMedicoDTO } from '../middlewares/transform.dto.js';
 
-// Rutas públicas (consulta)
+const router = express.Router();
+
+/**
+ * @swagger
+ * /api/medicos:
+ *   get:
+ *     summary: Obtener todos los médicos
+ *     tags: [Médicos]
+ *     responses:
+ *       200:
+ *         description: Lista de médicos
+ *   post:
+ *     summary: Crear un nuevo médico
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Médico creado exitosamente
+ */
+
+
 router.get('/', medicoController.getAll);
 router.get('/:id', idValidation, medicoController.getById);
 
-// Rutas protegidas solo para administradores (rol 3)
+
 router.post('/', authMiddleware, authorize(3), createValidation, transformToMedicoDTO, medicoController.create);
 router.put('/:id', authMiddleware, authorize(3), updateValidation, transformToMedicoDTO, medicoController.update);
 router.delete('/:id', authMiddleware, authorize(3), idValidation, medicoController.delete);
 
-module.exports = router;
+export default router;

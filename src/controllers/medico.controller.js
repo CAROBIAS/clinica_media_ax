@@ -1,9 +1,7 @@
-const service = require('../services/medico.service');
-const { ok, created, notFound } = require('../utils/response');
+import service from '../services/medico.service.js';
+import { ok, created, notFound } from '../utils/response.js';
 
-// Recibe la petición, llama al servicio y da formato de respuesta usando el helper response, recibe filtros por query en getAll
 class MedicoController {
-  // Obtiene todas los medicos
   async getAll(req, res, next) {
     try {
       const especialidadId = req.query.especialidadId;
@@ -14,7 +12,6 @@ class MedicoController {
     }
   }
 
-  // Obtiene medico por id
   async getById(req, res, next) {
     try {
       const { id } = req.params;
@@ -26,7 +23,6 @@ class MedicoController {
     }
   }
   
-  // Crea nuevo medico
   async create(req, res, next) {
     try {
       const data = await service.create(req.dto);
@@ -36,7 +32,6 @@ class MedicoController {
     }
   }
 
-  // Actualiza medico por id
   async update(req, res, next) {
     try {
       const { id } = req.params;
@@ -47,7 +42,6 @@ class MedicoController {
     }
   }
 
-  // Elimina medico por id (soft delete)
   async delete(req, res, next) {
     try {
       const { id } = req.params;
@@ -59,4 +53,4 @@ class MedicoController {
   }
 }
 
-module.exports = new MedicoController();
+export default new MedicoController();

@@ -1,7 +1,5 @@
-const { body, param } = require('express-validator');
-const { validationResult } = require('express-validator');
+import { body, param, validationResult } from 'express-validator';
 
-// Middleware que junta errores y responde 400 si hay
 const validarResultados = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -10,8 +8,7 @@ const validarResultados = (req, res, next) => {
   next();
 };
 
-// Nombre obligatorio, max 120 caracteres, trim y uppercase
-const crearEspecialidadValidation = [
+export const crearEspecialidadValidation = [
   body('nombre')
     .notEmpty().withMessage('El nombre es obligatorio')
     .isLength({ max: 120 }).withMessage('El nombre no debe superar los 120 caracteres')
@@ -20,8 +17,7 @@ const crearEspecialidadValidation = [
   validarResultados
 ];
 
-// Id debe ser valido, nombre obligatorio, max 120 caracteres, trim y uppercase
-const actualizarEspecialidadValidation = [
+export const actualizarEspecialidadValidation = [
   param('id').isInt({ min: 1 }).withMessage('ID inválido'),
   body('nombre')
     .notEmpty().withMessage('El nombre es obligatorio')
@@ -31,14 +27,7 @@ const actualizarEspecialidadValidation = [
   validarResultados
 ];
 
-// Validación para Id
-const idEspecialidadValidation = [
+export const idEspecialidadValidation = [
   param('id').isInt({ min: 1 }).withMessage('ID inválido'),
   validarResultados
 ];
-
-module.exports = {
-  crearEspecialidadValidation,
-  actualizarEspecialidadValidation,
-  idEspecialidadValidation
-};

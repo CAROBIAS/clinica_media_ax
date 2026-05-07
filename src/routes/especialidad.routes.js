@@ -1,11 +1,7 @@
 import express from 'express';
 import especialidadController from '../controllers/especialidad.controller.js';
 import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
-import {
-  crearEspecialidadValidation,
-  actualizarEspecialidadValidation,
-  idEspecialidadValidation
-} from '../middlewares/validations/especialidad.validation.js';
+import {  crearEspecialidadValidation,  actualizarEspecialidadValidation,  idEspecialidadValidation} from '../middlewares/validations/especialidad.validation.js';
 
 const router = express.Router();
 

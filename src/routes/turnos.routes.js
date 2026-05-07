@@ -1,14 +1,5 @@
 import express from 'express';
-import {
-  getTurnos,
-  getTurnoById,
-  createTurno,
-  updateTurno,
-  deleteTurno,
-  marcarAtendido,
-  estadisticasTurnos,
-  reportePDF
-} from '../controllers/turnos.controller.js';
+import {  getTurnos,  getTurnoById,  createTurno,  updateTurno,  deleteTurno,  marcarAtendido,  estadisticasTurnos,  reportePDF} from '../controllers/turnos.controller.js';
 
 import { validarTurno, validarId } from '../middlewares/turnos.validator.js';
 import { validationResult } from 'express-validator';
@@ -69,14 +60,7 @@ const validarCampos = (req, res, next) => {
 
 router.get('/', authMiddleware, getTurnos);
 
-router.post(
-  '/',
-  authMiddleware,
-  authorize(2, 3),
-  validarTurno,
-  validarCampos,
-  createTurno
-);
+router.post(  '/',  authMiddleware,  authorize(2, 3),  validarTurno,  validarCampos,  createTurno);
 
 /**
  * @swagger
@@ -93,12 +77,7 @@ router.post(
  *         description: No autorizado
  */
 
-router.get(
-  '/estadisticas/resumen',
-  authMiddleware,
-  authorize(3),
-  estadisticasTurnos
-);
+router.get(  '/estadisticas/resumen',  authMiddleware,  authorize(3),  estadisticasTurnos);
 
 /**
  * @swagger
@@ -118,12 +97,7 @@ router.get(
  *               format: binary
  */
 
-router.get(
-  '/reporte/estadisticas',
-  authMiddleware,
-  authorize(3),
-  reportePDF
-);
+router.get(  '/reporte/estadisticas',  authMiddleware,  authorize(3),  reportePDF);
 
 /**
  * @swagger
@@ -146,14 +120,7 @@ router.get(
  *         description: Turno no encontrado
  */
 
-router.put(
-  '/atendido/:id',
-  authMiddleware,
-  authorize(1),
-  validarId,
-  validarCampos,
-  marcarAtendido
-);
+router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  validarCampos,  marcarAtendido);
 
 /**
  * @swagger
@@ -218,30 +185,10 @@ router.put(
  *         description: Turno no encontrado
  */
 
-router.get(
-  '/:id',
-  authMiddleware,
-  validarId,
-  validarCampos,
-  getTurnoById
-);
+router.get(  '/:id',  authMiddleware,  validarId,  validarCampos,  getTurnoById);
 
-router.put(
-  '/:id',
-  authMiddleware,
-  authorize(3),
-  validarId,
-  validarCampos,
-  updateTurno
-);
+router.put(  '/:id',  authMiddleware,  authorize(3),  validarId,  validarCampos,  updateTurno);
 
-router.delete(
-  '/:id',
-  authMiddleware,
-  authorize(3),
-  validarId,
-  validarCampos,
-  deleteTurno
-);
+router.delete(  '/:id',  authMiddleware,  authorize(3),  validarId,  validarCampos,  deleteTurno);
 
 export default router;

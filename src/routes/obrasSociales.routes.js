@@ -1,13 +1,6 @@
 import { Router } from "express";
 
-import {
-  getObras,
-  createObra,
-  updateObra,
-  deleteObra,
-  asignarObrasAMedico,
-  validarCalculoTurno
-} from "../controllers/obrasSociales.controller.js";
+import {  getObras,  createObra,  updateObra,  deleteObra,  asignarObrasAMedico,  validarCalculoTurno} from "../controllers/obrasSociales.controller.js";
 
 import { authMiddleware, authorize } from "../middlewares/authMiddleware.js";
 
@@ -50,12 +43,7 @@ const router = Router();
 
 router.get("/obras-sociales", getObras);
 
-router.post(
-  "/obras-sociales",
-  authMiddleware,
-  authorize(3),
-  createObra
-);
+router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
 
 /**
  * @swagger
@@ -105,19 +93,9 @@ router.post(
  *         description: Obra social no encontrada
  */
 
-router.put(
-  "/obras-sociales/:id",
-  authMiddleware,
-  authorize(3),
-  updateObra
-);
+router.put(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  updateObra);
 
-router.delete(
-  "/obras-sociales/:id",
-  authMiddleware,
-  authorize(3),
-  deleteObra
-);
+router.delete(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  deleteObra);
 
 /**
  * @swagger
@@ -148,12 +126,7 @@ router.delete(
  *         description: Médico no encontrado
  */
 
-router.post(
-  "/medicos/:id/obras-sociales",
-  authMiddleware,
-  authorize(3),
-  asignarObrasAMedico
-);
+router.post(  "/medicos/:id/obras-sociales",  authMiddleware,  authorize(3),  asignarObrasAMedico);
 
 /**
  * @swagger
@@ -178,10 +151,6 @@ router.post(
  *         description: Turno no encontrado
  */
 
-router.get(
-  "/turnos/:turno_id/validar-calculo",
-  authMiddleware,
-  validarCalculoTurno
-);
+router.get(  "/turnos/:turno_id/validar-calculo",  authMiddleware,  validarCalculoTurno);
 
 export default router;

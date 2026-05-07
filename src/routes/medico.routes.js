@@ -1,11 +1,7 @@
 import express from 'express';
 import medicoController from '../controllers/medico.controller.js';
 import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
-import {
-  createValidation,
-  updateValidation,
-  idValidation
-} from '../middlewares/validations/medico.validation.js';
+import {  createValidation,  updateValidation,  idValidation} from '../middlewares/validations/medico.validation.js';
 import { transformToMedicoDTO } from '../middlewares/transform.dto.js';
 
 const router = express.Router();

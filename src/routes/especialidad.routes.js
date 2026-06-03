@@ -14,7 +14,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/especialidades:
+ * /api/v1/especialidades:
  *   get:
  *     summary: Obtener todas las especialidades
  *     tags: [Especialidades]
@@ -42,7 +42,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/especialidades/{id}:
+ * /api/v1/especialidades/{id}:
  *   get:
  *     summary: Obtener especialidad por ID
  *     tags: [Especialidades]

@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/obras-sociales:
+ * /api/v1/obras-sociales:
  *   get:
  *     summary: Obtener todas las obras sociales activas
  *     tags: [Obras Sociales]
@@ -47,7 +47,7 @@ router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
 
 /**
  * @swagger
- * /api/obras-sociales/{id}:
+ * /api/v1/obras-sociales/{id}:
  *   put:
  *     summary: Actualizar una obra social
  *     tags: [Obras Sociales]
@@ -99,7 +99,7 @@ router.delete(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  deleteOb
 
 /**
  * @swagger
- * /api/medicos/{id}/obras-sociales:
+ * /api/v1/medicos/{id}/obras-sociales:
  *   post:
  *     summary: Asignar obras sociales a un médico
  *     tags: [Obras Sociales]
@@ -130,7 +130,7 @@ router.post(  "/medicos/:id/obras-sociales",  authMiddleware,  authorize(3),  as
 
 /**
  * @swagger
- * /api/turnos/{turno_id}/validar-calculo:
+ * /api/v1/turnos/{turno_id}/validar-calculo:
  *   get:
  *     summary: Validar cálculo de un turno
  *     tags: [Obras Sociales]

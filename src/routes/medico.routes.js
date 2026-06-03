@@ -15,7 +15,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/medicos:
+ * /api/v1/medicos:
  *   get:
  *     summary: Obtener todos los médicos
  *     tags: [Médicos]
@@ -43,7 +43,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/medicos/{id}:
+ * /api/v1/medicos/{id}:
  *   get:
  *     summary: Obtener médico por ID
  *     tags: [Médicos]

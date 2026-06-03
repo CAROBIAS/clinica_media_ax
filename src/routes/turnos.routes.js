@@ -26,7 +26,7 @@ const validarCampos = (req, res, next) => {
 
 /**
  * @swagger
- * /api/turnos:
+ * /api/v1/turnos:
  *   get:
  *     summary: Obtener todos los turnos activos
  *     tags: [Turnos]
@@ -64,7 +64,7 @@ router.post(  '/',  authMiddleware,  authorize(2, 3),  validarTurno,  validarCam
 
 /**
  * @swagger
- * /api/turnos/estadisticas/resumen:
+ * /api/v1/turnos/estadisticas/resumen:
  *   get:
  *     summary: Obtener estadísticas generales de turnos
  *     tags: [Turnos]
@@ -81,7 +81,7 @@ router.get(  '/estadisticas/resumen',  authMiddleware,  authorize(3),  estadisti
 
 /**
  * @swagger
- * /api/turnos/reporte/estadisticas:
+ * /api/v1/turnos/reporte/estadisticas:
  *   get:
  *     summary: Descargar reporte PDF con estadísticas
  *     tags: [Turnos]
@@ -101,7 +101,7 @@ router.get(  '/reporte/estadisticas',  authMiddleware,  authorize(3),  reportePD
 
 /**
  * @swagger
- * /api/turnos/atendido/{id}:
+ * /api/v1/turnos/atendido/{id}:
  *   put:
  *     summary: Marcar turno como atendido
  *     tags: [Turnos]
@@ -124,7 +124,7 @@ router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  valid
 
 /**
  * @swagger
- * /api/turnos/{id}:
+ * /api/v1/turnos/{id}:
  *   get:
  *     summary: Obtener turno por ID
  *     tags: [Turnos]

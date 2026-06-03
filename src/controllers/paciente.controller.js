@@ -3,7 +3,8 @@ import { pool } from '../config/db.js';
 export const updateObraSocial = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { id_obra_social } = req.body;
+    const body = req.body || {};
+    const { id_obra_social } = body;
 
     if (!id_obra_social) {
       return res.status(400).json({ ok: false, message: 'id_obra_social es requerido' });

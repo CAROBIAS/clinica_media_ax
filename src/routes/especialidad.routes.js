@@ -8,23 +8,23 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Especialidades
+ *   name: Especialidades v1
  *   description: Endpoints para gestión de especialidades
  */
 
 /**
  * @swagger
- * /api/v1/especialidades:
+ * /especialidades:
  *   get:
  *     summary: Obtener todas las especialidades
- *     tags: [Especialidades]
+ *     tags: [Especialidades v1]
  *     responses:
  *       200:
  *         description: Lista de especialidades
  *
  *   post:
  *     summary: Crear una nueva especialidad
- *     tags: [Especialidades]
+ *     tags: [Especialidades v1]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -42,10 +42,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/especialidades/{id}:
+ * /especialidades/{id}:
  *   get:
  *     summary: Obtener especialidad por ID
- *     tags: [Especialidades]
+ *     tags: [Especialidades v1]
  *     parameters:
  *       - in: path
  *         name: id
@@ -60,7 +60,7 @@ const router = express.Router();
  *
  *   put:
  *     summary: Actualizar especialidad
- *     tags: [Especialidades]
+ *     tags: [Especialidades v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -85,7 +85,7 @@ const router = express.Router();
  *
  *   delete:
  *     summary: Eliminar especialidad
- *     tags: [Especialidades]
+ *     tags: [Especialidades v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:

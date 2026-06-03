@@ -7,13 +7,13 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Pacientes
+ *   name: Pacientes v2
  *   description: Endpoints para gestión de pacientes
  */
 
 /**
  * @swagger
- * /api/v2/pacientes:
+ * /pacientes:
  *   get:
  *     summary: Obtener todos los pacientes (Admin)
  *     tags: [Pacientes v2]
@@ -29,7 +29,7 @@ router.get('/pacientes', authMiddleware, authorize(3), getAllPacientes);
 
 /**
  * @swagger
- * /api/v2/pacientes/{id}/obra-social:
+ * /pacientes/{id}/obra-social:
  *   put:
  *     summary: Asignar obra social a un paciente (Admin)
  *     tags: [Pacientes v2]

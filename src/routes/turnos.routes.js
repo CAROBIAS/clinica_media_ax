@@ -20,16 +20,16 @@ const validarCampos = (req, res, next) => {
 /**
  * @swagger
  * tags:
- *   name: Turnos
+ *   name: Turnos v1
  *   description: Gestión de turnos médicos
  */
 
 /**
  * @swagger
- * /api/turnos:
+ * /turnos:
  *   get:
  *     summary: Obtener todos los turnos activos
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -40,7 +40,7 @@ const validarCampos = (req, res, next) => {
  *
  *   post:
  *     summary: Crear un nuevo turno
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -64,10 +64,10 @@ router.post(  '/',  authMiddleware,  authorize(2, 3),  validarTurno,  validarCam
 
 /**
  * @swagger
- * /api/turnos/estadisticas/resumen:
+ * /turnos/estadisticas/resumen:
  *   get:
  *     summary: Obtener estadísticas generales de turnos
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -81,10 +81,10 @@ router.get(  '/estadisticas/resumen',  authMiddleware,  authorize(3),  estadisti
 
 /**
  * @swagger
- * /api/turnos/reporte/estadisticas:
+ * /turnos/reporte/estadisticas:
  *   get:
  *     summary: Descargar reporte PDF con estadísticas
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -101,10 +101,10 @@ router.get(  '/reporte/estadisticas',  authMiddleware,  authorize(3),  reportePD
 
 /**
  * @swagger
- * /api/turnos/atendido/{id}:
+ * /turnos/atendido/{id}:
  *   put:
  *     summary: Marcar turno como atendido
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -124,10 +124,10 @@ router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  valid
 
 /**
  * @swagger
- * /api/turnos/{id}:
+ * /turnos/{id}:
  *   get:
  *     summary: Obtener turno por ID
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -144,7 +144,7 @@ router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  valid
  *
  *   put:
  *     summary: Actualizar un turno
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -169,7 +169,7 @@ router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  valid
  *
  *   delete:
  *     summary: Eliminar un turno
- *     tags: [Turnos]
+ *     tags: [Turnos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:

@@ -9,23 +9,23 @@ const router = Router();
 /**
  * @swagger
  * tags:
- *   name: Obras Sociales
+ *   name: Obras Sociales v1
  *   description: Gestión de obras sociales y validaciones
  */
 
 /**
  * @swagger
- * /api/obras-sociales:
+ * /obras-sociales:
  *   get:
  *     summary: Obtener todas las obras sociales activas
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     responses:
  *       200:
  *         description: Lista de obras sociales
  *
  *   post:
  *     summary: Crear una nueva obra social
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -47,10 +47,10 @@ router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
 
 /**
  * @swagger
- * /api/obras-sociales/{id}:
+ * /obras-sociales/{id}:
  *   put:
  *     summary: Actualizar una obra social
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -75,7 +75,7 @@ router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
  *
  *   delete:
  *     summary: Eliminar una obra social
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -99,10 +99,10 @@ router.delete(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  deleteOb
 
 /**
  * @swagger
- * /api/medicos/{id}/obras-sociales:
+ * /medicos/{id}/obras-sociales:
  *   post:
  *     summary: Asignar obras sociales a un médico
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -130,10 +130,10 @@ router.post(  "/medicos/:id/obras-sociales",  authMiddleware,  authorize(3),  as
 
 /**
  * @swagger
- * /api/turnos/{turno_id}/validar-calculo:
+ * /turnos/{turno_id}/validar-calculo:
  *   get:
  *     summary: Validar cálculo de un turno
- *     tags: [Obras Sociales]
+ *     tags: [Obras Sociales v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:

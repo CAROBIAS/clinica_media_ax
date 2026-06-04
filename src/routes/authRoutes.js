@@ -5,10 +5,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Iniciar sesión
- *     tags: [Autenticación]
+ *     tags: [Autenticación v1]
  *     requestBody:
  *       required: true
  *       content:

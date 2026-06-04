@@ -9,23 +9,23 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Médicos
+ *   name: Médicos v1
  *   description: Endpoints para gestión de médicos
  */
 
 /**
  * @swagger
- * /api/medicos:
+ * /medicos:
  *   get:
  *     summary: Obtener todos los médicos
- *     tags: [Médicos]
+ *     tags: [Médicos v1]
  *     responses:
  *       200:
  *         description: Lista de médicos
  *
  *   post:
  *     summary: Crear un nuevo médico
- *     tags: [Médicos]
+ *     tags: [Médicos v1]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -43,10 +43,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/medicos/{id}:
+ * /medicos/{id}:
  *   get:
  *     summary: Obtener médico por ID
- *     tags: [Médicos]
+ *     tags: [Médicos v1]
  *     parameters:
  *       - in: path
  *         name: id
@@ -61,7 +61,7 @@ const router = express.Router();
  *
  *   put:
  *     summary: Actualizar médico
- *     tags: [Médicos]
+ *     tags: [Médicos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -86,7 +86,7 @@ const router = express.Router();
  *
  *   delete:
  *     summary: Eliminar médico
- *     tags: [Médicos]
+ *     tags: [Médicos v1]
  *     security:
  *       - bearerAuth: []
  *     parameters:

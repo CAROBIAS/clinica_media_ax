@@ -1,5 +1,5 @@
 import { pool } from '../config/db.js';
-import { generarPdfEstadisticas } from '../services/reporteService.js';
+import { generarPdfEstadisticas, obtenerDatosReporte } from '../services/reporteService.js';
 
 async function getPacienteIdByUsuarioId(usuarioId) {
   const [rows] = await pool.query(
@@ -262,33 +262,7 @@ export const estadisticasTurnos = async (req, res, next) => {
 
 export const reportePDF = async (req, res, next) => {
   try {
-    const [[{ total }]] = await pool.query(
-      'SELECT COUNT(*) as total FROM turnos_reservas WHERE activo = 1'
-    );
-
-    const [porObra] = await pool.query(`
-      SELECT os.nombre AS obra_social, COUNT(t.id_turno_reserva) AS cantidad
-      FROM turnos_reservas t
-      JOIN obras_sociales os ON t.id_obra_social = os.id_obra_social
-      WHERE t.activo = 1
-      GROUP BY os.id_obra_social
-    `);
-
-    const [porEspecialidad] = await pool.query(`
-      SELECT e.nombre AS especialidad, COUNT(t.id_turno_reserva) AS cantidad
-      FROM turnos_reservas t
-      JOIN medicos m ON t.id_medico = m.id_medico
-      JOIN especialidades e ON m.id_especialidad = e.id_especialidad
-      WHERE t.activo = 1
-      GROUP BY e.id_especialidad
-    `);
-
-    const datosParaPdf = {
-      totalTurnos: total,
-      porObraSocial: porObra,
-      porEspecialidad: porEspecialidad,
-    };
-
+    const datosParaPdf = await obtenerDatosReporte();
     generarPdfEstadisticas(datosParaPdf, res);
   } catch (error) {
     console.error('Error en reportePDF:', error);

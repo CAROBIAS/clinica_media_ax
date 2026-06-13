@@ -14,7 +14,7 @@ export const createObra = async (req, res) => {
     [nombre, descuento]
   );
 
-  res.json({ id: result.insertId });
+  res.status(201).json({ id: result.insertId });
 };
 
 export const updateObra = async (req, res) => {

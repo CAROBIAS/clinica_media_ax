@@ -3,6 +3,8 @@ import { Router } from "express";
 import {  getObras,  createObra,  updateObra,  deleteObra,  asignarObrasAMedico,  validarCalculoTurno} from "../controllers/obrasSociales.controller.js";
 
 import { authMiddleware, authorize } from "../middlewares/authMiddleware.js";
+// Fix segun feedback de la segunda entrega, agregadas importaciones de validaciones de obras sociales y turnos
+import { crearObraSocialValidation, actualizarObraSocialValidation, idObraSocialValidation, asignarObrasValidation, validarTurnoIdParam } from "../middlewares/validations/obraSocial.validation.js";
 
 const router = Router();
 
@@ -41,9 +43,11 @@ const router = Router();
  *         description: No autorizado
  */
 
-router.get("/obras-sociales", getObras);
+// Fix segun feedback de la segunda entrega, agregadas validaciones de obras sociales y turnos
 
-router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
+router.get("/obras-sociales", authMiddleware,  authorize(2, 3), getObras);
+
+router.post('/obras-sociales', authMiddleware, authorize(3), crearObraSocialValidation, createObra);
 
 /**
  * @swagger
@@ -93,9 +97,11 @@ router.post(  "/obras-sociales",  authMiddleware,  authorize(3),  createObra);
  *         description: Obra social no encontrada
  */
 
-router.put(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  updateObra);
+// Fix segun feedback de la segunda entrega, agregadas validaciones de obras sociales y turnos
 
-router.delete(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  deleteObra);
+router.put('/obras-sociales/:id', authMiddleware, authorize(3), actualizarObraSocialValidation, updateObra);
+
+router.delete('/obras-sociales/:id', authMiddleware, authorize(3), idObraSocialValidation, deleteObra);
 
 /**
  * @swagger
@@ -126,7 +132,9 @@ router.delete(  "/obras-sociales/:id",  authMiddleware,  authorize(3),  deleteOb
  *         description: Médico no encontrado
  */
 
-router.post(  "/medicos/:id/obras-sociales",  authMiddleware,  authorize(3),  asignarObrasAMedico);
+// Fix segun feedback de la segunda entrega, agregadas validaciones de obras sociales y turnos
+
+router.post('/medicos/:id/obras-sociales', authMiddleware, authorize(3), asignarObrasValidation, asignarObrasAMedico);
 
 /**
  * @swagger
@@ -151,6 +159,8 @@ router.post(  "/medicos/:id/obras-sociales",  authMiddleware,  authorize(3),  as
  *         description: Turno no encontrado
  */
 
-router.get(  "/turnos/:turno_id/validar-calculo",  authMiddleware,  validarCalculoTurno);
+// Fix segun feedback de la segunda entrega, agregadas validaciones de obras sociales y turnos
+
+router.get('/turnos/:turno_id/validar-calculo', authMiddleware, validarTurnoIdParam, validarCalculoTurno);
 
 export default router;

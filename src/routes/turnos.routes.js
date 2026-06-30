@@ -120,8 +120,9 @@ router.get(  '/reporte/estadisticas',  authMiddleware,  authorize(3),  reportePD
  *         description: Turno no encontrado
  */
 
-router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  validarCampos,  marcarAtendido);
+// Fix segun feedback de la segunda entrega, se agrega la validacion de id y validacion de campos
 
+router.put('/atendido/:id', authMiddleware, authorize(1), validarId, validarCampos, marcarAtendido);
 /**
  * @swagger
  * /turnos/{id}:
@@ -185,10 +186,12 @@ router.put(  '/atendido/:id',  authMiddleware,  authorize(1),  validarId,  valid
  *         description: Turno no encontrado
  */
 
-router.get(  '/:id',  authMiddleware,  validarId,  validarCampos,  getTurnoById);
+// Fix segun feedback de la segunda entrega, se agrega la validacion de id y validacion de campos
 
-router.put(  '/:id',  authMiddleware,  authorize(3),  validarId,  validarCampos,  updateTurno);
+router.get('/:id', authMiddleware, validarId, validarCampos, getTurnoById);
 
-router.delete(  '/:id',  authMiddleware,  authorize(3),  validarId,  validarCampos,  deleteTurno);
+router.put('/:id', authMiddleware, authorize(1), validarId, validarCampos, updateTurno);
+
+router.delete('/:id', authMiddleware, authorize(3), validarId, validarCampos, deleteTurno);
 
 export default router;

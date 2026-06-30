@@ -1,6 +1,8 @@
 import express from 'express';
 import { updateObraSocial, getAllPacientes } from '../controllers/paciente.controller.js';
 import { authMiddleware, authorize } from '../middlewares/authMiddleware.js';
+// Fix segun feedback de la segunda entrega, se importa la validacion de obra social
+import { actualizarObraSocialValidation } from '../middlewares/validations/paciente.validation.js';
 
 const router = express.Router();
 
@@ -61,6 +63,9 @@ router.get('/pacientes', authMiddleware, authorize(3), getAllPacientes);
  *       404:
  *         description: Paciente u obra social no encontrados
  */
-router.put('/pacientes/:id/obra-social', authMiddleware, authorize(3), updateObraSocial);
+
+// Fix segun feedback de la segunda entrega, se agrega la validacion de obra social
+
+router.put( '/pacientes/:id/obra-social', authMiddleware, authorize(3), actualizarObraSocialValidation, updateObraSocial );
 
 export default router;

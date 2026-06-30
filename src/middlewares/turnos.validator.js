@@ -6,7 +6,7 @@ export const validarTurno = [
     .isInt().withMessage('id_medico debe ser número'),
 
   body('id_paciente')
-    .notEmpty().withMessage('id_paciente es obligatorio')
+    .optional() // Fix segun el feedback de la segunda entrega, id_paciente es opcional
     .isInt().withMessage('id_paciente debe ser número'),
 
   body('id_obra_social')

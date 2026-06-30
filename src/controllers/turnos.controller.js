@@ -1,18 +1,11 @@
-import { pool } from '../config/db.js';
+import turnoService from '../services/turno.service.js';
+import pacienteService from '../services/paciente.service.js';
 import { generarPdfEstadisticas, obtenerDatosReporte } from '../services/reporteService.js';
+import { pool } from '../config/db.js';
 
-async function getPacienteIdByUsuarioId(usuarioId) {
-  const [rows] = await pool.query(
-    `SELECT p.id_paciente
-     FROM pacientes p
-     JOIN usuarios u ON p.id_usuario = u.id_usuario
-     WHERE u.id_usuario = ? AND u.activo = 1`,
-    [usuarioId]
-  );
-  return rows.length > 0 ? rows[0].id_paciente : null;
-}
+// Fix segun feedback de la segunda entrega, se agregan los controladores de turno y validaciones
 
-async function getMedicoIdByUsuarioId(usuarioId) {
+async function obtenerMedicoIdPorUsuario(usuarioId) {
   const [rows] = await pool.query(
     `SELECT m.id_medico
      FROM medicos m
@@ -27,47 +20,27 @@ export const getTurnos = async (req, res, next) => {
   try {
     const user = req.user;
     const rol = user.rol;
-
-    let query = `
-      SELECT t.*,
-             m.id_medico,
-             u_med.apellido as medico_apellido,
-             u_med.nombres as medico_nombres,
-             p.id_paciente,
-             u_pac.apellido as paciente_apellido,
-             u_pac.nombres as paciente_nombres,
-             os.nombre as obra_social_nombre,
-             os.porcentaje_descuento
-      FROM turnos_reservas t
-      JOIN medicos m ON t.id_medico = m.id_medico
-      JOIN usuarios u_med ON m.id_usuario = u_med.id_usuario
-      JOIN pacientes p ON t.id_paciente = p.id_paciente
-      JOIN usuarios u_pac ON p.id_usuario = u_pac.id_usuario
-      LEFT JOIN obras_sociales os ON t.id_obra_social = os.id_obra_social
-      WHERE t.activo = 1
-        AND u_med.activo = 1
-        AND u_pac.activo = 1
-    `;
-    const params = [];
+    let filtros = {};
 
     if (rol === 1) {
-      const idMedico = await getMedicoIdByUsuarioId(user.id);
+      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
       if (!idMedico) {
         return res.status(403).json({ ok: false, message: 'Usuario no corresponde a un médico activo' });
       }
-      query += ' AND t.id_medico = ?';
-      params.push(idMedico);
+      filtros.idMedico = idMedico;
     } else if (rol === 2) {
-      const idPaciente = await getPacienteIdByUsuarioId(user.id);
+      const idPaciente = await pacienteService.obtenerIdPacientePorUsuario(user.id);
       if (!idPaciente) {
         return res.status(403).json({ ok: false, message: 'Usuario no corresponde a un paciente activo' });
       }
-      query += ' AND t.id_paciente = ?';
-      params.push(idPaciente);
+      filtros.idPaciente = idPaciente;
+    } else if (rol === 3) {
+    } else {
+      return res.status(403).json({ ok: false, message: 'Rol no autorizado' });
     }
 
-    const [rows] = await pool.query(query, params);
-    res.json({ ok: true, data: rows });
+    const turnos = await turnoService.obtenerTurnos(filtros);
+    res.json({ ok: true, data: turnos });
   } catch (error) {
     next(error);
   }
@@ -76,32 +49,27 @@ export const getTurnos = async (req, res, next) => {
 export const getTurnoById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query(
-      `
-      SELECT t.*,
-             m.id_medico,
-             u_med.apellido as medico_apellido,
-             u_med.nombres as medico_nombres,
-             p.id_paciente,
-             u_pac.apellido as paciente_apellido,
-             u_pac.nombres as paciente_nombres,
-             os.nombre as obra_social_nombre
-      FROM turnos_reservas t
-      JOIN medicos m ON t.id_medico = m.id_medico
-      JOIN usuarios u_med ON m.id_usuario = u_med.id_usuario
-      JOIN pacientes p ON t.id_paciente = p.id_paciente
-      JOIN usuarios u_pac ON p.id_usuario = u_pac.id_usuario
-      LEFT JOIN obras_sociales os ON t.id_obra_social = os.id_obra_social
-      WHERE t.id_turno_reserva = ?
-        AND t.activo = 1
-        AND u_med.activo = 1
-        AND u_pac.activo = 1
-      `,
-      [id]
-    );
-    if (!rows.length)
+    const user = req.user;
+    const turno = await turnoService.obtenerTurnoPorId(id);
+    if (!turno) {
       return res.status(404).json({ ok: false, message: 'Turno no encontrado' });
-    res.json({ ok: true, data: rows[0] });
+    }
+
+    if (user.rol === 1) {
+      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+      if (turno.id_medico !== idMedico) {
+        return res.status(403).json({ ok: false, message: 'No tienes permiso para ver este turno' });
+      }
+    } else if (user.rol === 2) {
+      const idPaciente = await pacienteService.obtenerIdPacientePorUsuario(user.id);
+      if (turno.id_paciente !== idPaciente) {
+        return res.status(403).json({ ok: false, message: 'No tienes permiso para ver este turno' });
+      }
+    } else if (user.rol !== 3) {
+      return res.status(403).json({ ok: false, message: 'Rol no autorizado' });
+    }
+
+    res.json({ ok: true, data: turno });
   } catch (error) {
     next(error);
   }
@@ -110,83 +78,40 @@ export const getTurnoById = async (req, res, next) => {
 export const createTurno = async (req, res, next) => {
   try {
     let { id_medico, id_paciente, id_obra_social, fecha_hora } = req.body;
+    const user = req.user;
 
-    if (!id_medico || !id_paciente || !fecha_hora) {
+    if (!id_medico || !fecha_hora) {
       return res.status(400).json({
         ok: false,
-        message: 'Faltan campos obligatorios: id_medico, id_paciente, fecha_hora',
+        message: 'Faltan campos obligatorios: id_medico, fecha_hora',
       });
     }
 
-    if (!id_obra_social) {
-      const [particular] = await pool.query(
-        'SELECT id_obra_social FROM obras_sociales WHERE es_particular = 1 AND activo = 1 LIMIT 1'
-      );
-      if (particular.length === 0) {
-        return res.status(500).json({
-          ok: false,
-          message: "No hay una obra social marcada como 'particular'. Cree una con es_particular=1.",
-        });
+    if (user.rol === 2) {
+      const idPaciente = await pacienteService.obtenerIdPacientePorUsuario(user.id);
+      if (!idPaciente) {
+        return res.status(403).json({ ok: false, message: 'No eres un paciente registrado' });
       }
-      id_obra_social = particular[0].id_obra_social;
+      id_paciente = idPaciente;
+    } else if (user.rol === 3) {
+      if (!id_paciente) {
+        return res.status(400).json({ ok: false, message: 'id_paciente es requerido para administradores' });
+      }
+    } else {
+      return res.status(403).json({ ok: false, message: 'Rol no autorizado para crear turnos' });
     }
 
-    const [medico] = await pool.query(
-      `SELECT m.valor_consulta
-       FROM medicos m
-       JOIN usuarios u ON m.id_usuario = u.id_usuario
-       WHERE m.id_medico = ? AND u.activo = 1`,
-      [id_medico]
-    );
-    if (medico.length === 0) {
-      return res.status(400).json({ ok: false, message: 'Médico inválido o usuario inactivo' });
-    }
-    const valorConsulta = parseFloat(medico[0].valor_consulta);
-
-    const [paciente] = await pool.query(
-      `SELECT p.id_paciente
-       FROM pacientes p
-       JOIN usuarios u ON p.id_usuario = u.id_usuario
-       WHERE p.id_paciente = ? AND u.activo = 1`,
-      [id_paciente]
-    );
-    if (paciente.length === 0) {
-      return res.status(400).json({ ok: false, message: 'Paciente inválido o usuario inactivo' });
-    }
-
-    const [obra] = await pool.query(
-      'SELECT porcentaje_descuento, es_particular FROM obras_sociales WHERE id_obra_social = ? AND activo = 1',
-      [id_obra_social]
-    );
-    if (obra.length === 0) {
-      return res.status(400).json({ ok: false, message: 'Obra social inválida o inactiva' });
-    }
-
-    let valorTotalCalculado = valorConsulta;
-    if (obra[0].es_particular === 0) {
-      const descuento = parseFloat(obra[0].porcentaje_descuento);
-      valorTotalCalculado = valorConsulta - (valorConsulta * (descuento / 100));
-    }
-
-    const [ocupado] = await pool.query(
-      'SELECT id_turno_reserva FROM turnos_reservas WHERE id_medico = ? AND fecha_hora = ? AND activo = 1',
-      [id_medico, fecha_hora]
-    );
-    if (ocupado.length) {
-      return res.status(400).json({ ok: false, message: 'Horario no disponible' });
-    }
-
-    const [result] = await pool.query(
-      `INSERT INTO turnos_reservas
-       (id_medico, id_paciente, id_obra_social, fecha_hora, valor_total, atentido, activo)
-       VALUES (?, ?, ?, ?, ?, 0, 1)`,
-      [id_medico, id_paciente, id_obra_social, fecha_hora, valorTotalCalculado]
-    );
+    const resultado = await turnoService.crearTurno({
+      id_medico,
+      id_paciente,
+      id_obra_social,
+      fecha_hora,
+    });
 
     res.status(201).json({
       ok: true,
-      id: result.insertId,
-      valor_total: valorTotalCalculado,
+      id: resultado.id,
+      valor_total: resultado.valor_total,
       message: 'Turno creado',
     });
   } catch (error) {
@@ -198,13 +123,27 @@ export const updateTurno = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { fecha_hora } = req.body;
+    const user = req.user;
+
     if (!fecha_hora) {
       return res.status(400).json({ ok: false, message: 'fecha_hora es requerida' });
     }
-    await pool.query(
-      'UPDATE turnos_reservas SET fecha_hora = ? WHERE id_turno_reserva = ? AND activo = 1',
-      [fecha_hora, id]
-    );
+
+    const turno = await turnoService.obtenerTurnoPorId(id);
+    if (!turno) {
+      return res.status(404).json({ ok: false, message: 'Turno no encontrado' });
+    }
+
+    if (user.rol === 1) {
+      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+      if (turno.id_medico !== idMedico) {
+        return res.status(403).json({ ok: false, message: 'No puedes modificar un turno que no te pertenece' });
+      }
+    } else {
+      return res.status(403).json({ ok: false, message: 'No tienes permiso para actualizar este turno' });
+    }
+
+    await turnoService.actualizarFechaTurno(id, fecha_hora);
     res.json({ ok: true, message: 'Turno actualizado' });
   } catch (error) {
     next(error);
@@ -214,7 +153,12 @@ export const updateTurno = async (req, res, next) => {
 export const deleteTurno = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await pool.query('UPDATE turnos_reservas SET activo = 0 WHERE id_turno_reserva = ?', [id]);
+    const turno = await turnoService.obtenerTurnoPorId(id);
+    if (!turno) {
+      return res.status(404).json({ ok: false, message: 'Turno no encontrado' });
+    }
+
+    await turnoService.eliminarTurno(id);
     res.json({ ok: true, message: 'Turno eliminado (soft delete)' });
   } catch (error) {
     next(error);
@@ -224,27 +168,22 @@ export const deleteTurno = async (req, res, next) => {
 export const marcarAtendido = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const user = req.user;
 
-    const idMedico = await getMedicoIdByUsuarioId(userId);
+    const idMedico = await obtenerMedicoIdPorUsuario(user.id);
     if (!idMedico) {
       return res.status(403).json({ ok: false, message: 'No eres un médico registrado' });
     }
 
-    const [turno] = await pool.query(
-      `SELECT id_turno_reserva
-       FROM turnos_reservas
-       WHERE id_turno_reserva = ? AND id_medico = ? AND activo = 1`,
-      [id, idMedico]
-    );
-    if (turno.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        message: 'Turno no encontrado o no pertenece a este médico',
-      });
+    const turno = await turnoService.obtenerTurnoPorId(id);
+    if (!turno) {
+      return res.status(404).json({ ok: false, message: 'Turno no encontrado' });
+    }
+    if (turno.id_medico !== idMedico) {
+      return res.status(403).json({ ok: false, message: 'No puedes marcar un turno que no te pertenece' });
     }
 
-    await pool.query('UPDATE turnos_reservas SET atentido = 1 WHERE id_turno_reserva = ?', [id]);
+    await turnoService.marcarAtendido(id, idMedico);
     res.json({ ok: true, message: 'Turno marcado como atendido' });
   } catch (error) {
     next(error);
@@ -253,8 +192,8 @@ export const marcarAtendido = async (req, res, next) => {
 
 export const estadisticasTurnos = async (req, res, next) => {
   try {
-    const [rows] = await pool.query('CALL especialidades_x_turnos()');
-    res.json({ ok: true, data: rows[0] });
+    const data = await turnoService.obtenerEstadisticas();
+    res.json({ ok: true, data });
   } catch (error) {
     next(error);
   }
@@ -267,5 +206,22 @@ export const reportePDF = async (req, res, next) => {
   } catch (error) {
     console.error('Error en reportePDF:', error);
     res.status(500).json({ ok: false, message: 'Error al generar el reporte PDF' });
+  }
+};
+
+export const validarCalculoTurno = async (req, res, next) => {
+  try {
+    const { turno_id } = req.params;
+    const resultado = await turnoService.validarCalculo(turno_id);
+    if (!resultado.coincide) {
+      return res.status(400).json({
+        error: 'El cálculo NO coincide',
+        calculado: resultado.calculado,
+        valor_bd: resultado.guardado,
+      });
+    }
+    res.json({ ok: true, mensaje: 'Cálculo correcto' });
+  } catch (error) {
+    next(error);
   }
 };

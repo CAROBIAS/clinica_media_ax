@@ -1,20 +1,9 @@
 import turnoService from '../services/turno.service.js';
 import pacienteService from '../services/paciente.service.js';
 import { generarPdfEstadisticas, obtenerDatosReporte } from '../services/reporteService.js';
-import { pool } from '../config/db.js';
+
 
 // Fix segun feedback de la segunda entrega, se agregan los controladores de turno y validaciones
-
-async function obtenerMedicoIdPorUsuario(usuarioId) {
-  const [rows] = await pool.query(
-    `SELECT m.id_medico
-     FROM medicos m
-     JOIN usuarios u ON m.id_usuario = u.id_usuario
-     WHERE u.id_usuario = ? AND u.activo = 1`,
-    [usuarioId]
-  );
-  return rows.length > 0 ? rows[0].id_medico : null;
-}
 
 export const getTurnos = async (req, res, next) => {
   try {
@@ -23,7 +12,7 @@ export const getTurnos = async (req, res, next) => {
     let filtros = {};
 
     if (rol === 1) {
-      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+      const idMedico = await turnoService.obtenerIdMedicoPorUsuario(user.id);
       if (!idMedico) {
         return res.status(403).json({ ok: false, message: 'Usuario no corresponde a un médico activo' });
       }
@@ -56,7 +45,7 @@ export const getTurnoById = async (req, res, next) => {
     }
 
     if (user.rol === 1) {
-      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+      const idMedico = await turnoService.obtenerIdMedicoPorUsuario(user.id);
       if (turno.id_medico !== idMedico) {
         return res.status(403).json({ ok: false, message: 'No tienes permiso para ver este turno' });
       }
@@ -135,7 +124,7 @@ export const updateTurno = async (req, res, next) => {
     }
 
     if (user.rol === 1) {
-      const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+      const idMedico = await turnoService.obtenerIdMedicoPorUsuario(user.id);
       if (turno.id_medico !== idMedico) {
         return res.status(403).json({ ok: false, message: 'No puedes modificar un turno que no te pertenece' });
       }
@@ -170,7 +159,7 @@ export const marcarAtendido = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user;
 
-    const idMedico = await obtenerMedicoIdPorUsuario(user.id);
+    const idMedico = await turnoService.obtenerIdMedicoPorUsuario(user.id);
     if (!idMedico) {
       return res.status(403).json({ ok: false, message: 'No eres un médico registrado' });
     }

@@ -22,11 +22,11 @@ export const crearObraSocialValidation = [
   body('es_particular')
     .optional()
     .isBoolean().withMessage('es_particular debe ser booleano (true/false)'),
-  validarResultados,
   body('descripcion')
-  .optional()
-  .isString()
-  .isLength({ max: 255 }).withMessage('La descripción no debe superar los 255 caracteres'),
+    .optional()
+    .isString()
+    .isLength({ max: 255 }).withMessage('La descripción no debe superar los 255 caracteres'),
+  validarResultados,
 ];
 
 export const actualizarObraSocialValidation = [
@@ -42,11 +42,11 @@ export const actualizarObraSocialValidation = [
   body('es_particular')
     .optional()
     .isBoolean().withMessage('es_particular debe ser booleano (true/false)'),
-  validarResultados,
   body('descripcion')
-  .optional()
-  .isString()
-  .isLength({ max: 255 }).withMessage('La descripción no debe superar los 255 caracteres'),
+    .optional()
+    .isString()
+    .isLength({ max: 255 }).withMessage('La descripción no debe superar los 255 caracteres'),
+  validarResultados,
 ];
 
 export const idObraSocialValidation = [

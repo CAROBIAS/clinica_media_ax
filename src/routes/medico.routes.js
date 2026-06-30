@@ -105,8 +105,8 @@ const router = express.Router();
  */
 
 
-router.get('/', medicoController.getAll);
-router.get('/:id', idValidation, medicoController.getById);
+router.get('/', authMiddleware, medicoController.getAll);
+router.get('/:id', authMiddleware, idValidation, medicoController.getById);
 
 
 router.post('/', authMiddleware, authorize(3), createValidation, transformToMedicoDTO, medicoController.create);

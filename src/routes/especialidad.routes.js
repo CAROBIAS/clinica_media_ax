@@ -104,8 +104,8 @@ const router = express.Router();
  */
 
 
-router.get('/', especialidadController.getAll);
-router.get('/:id', idEspecialidadValidation, especialidadController.getById);
+router.get('/', authMiddleware, especialidadController.getAll);
+router.get('/:id', authMiddleware, idEspecialidadValidation, especialidadController.getById);
 
 
 router.post('/', authMiddleware, authorize(3), crearEspecialidadValidation, especialidadController.create);

@@ -1,0 +1,26 @@
+Residuos menores (ninguno era parte del feedback, pero los corrijo para evitar otro problema):
+
+1- turnos.controller.js todavía importa pool y tiene un helper (obtenerMedicoIdPorUsuario) que consulta la base directo desde el controlador. Es lo único que quedó de acceso directo; lo ideal sería moverlo a un modelo/servicio para ser 100% consistente.
+2- GET /medicos sigue sin authMiddleware (queda público). No estaba entre los 4 puntos, pero es del mismo tipo que lo corregido; conviene cerrarlo y revisar igual GET /especialidades.
+3- Orden en la validación de obra social: en crearObraSocialValidation/actualizarObraSocialValidation, el chequeo de resultados (validarResultados) quedó antes de la regla de descripcion, así que esa regla nunca llega a ejecutarse (queda como código muerto). No rompe nada, pero si querés que valide descripcion, movés validarResultados al final del array.
+4- El stored procedure especialidades_x_turnos se sigue llamando en turno.model.obtenerEstadisticas() y no está en el dump de la base. No era parte del feedback, pero si lo prueban en la corrección y no existe en la base del docente, ese endpoint falla.
+
+
+punto 2: Cómo verificar que quedó bien
+
+Sin token, GET /api/v1/medicos y GET /api/v1/especialidades ahora devuelven 401 (antes respondían igual sin login).
+Con token de paciente (rol 2), ambos siguen funcionando y devuelven la lista → la regla de negocio (el paciente elige médico/especialidad para pedir turno) queda intacta.
+Con token de admin o médico, también funcionan.
+
+
+punto 3: Cómo verificar
+
+Mandás un POST /api/v1/obras-sociales con una descripcion de más de 255 caracteres: ahora tiene que responder 400 con el mensaje "La descripción no debe superar los 255 caracteres". Antes lo dejaba pasar.
+
+
+
+punto 4: Cómo verificar que quedó bien
+
+Levantás el servidor (npm run dev). En la consola tiene que aparecer "Procedimientos almacenados instalados correctamente".
+En phpMyAdmin → base prog3_turnos → pestaña Rutinas, debería figurar especialidades_x_turnos.
+En Swagger, con token de admin, probás GET /api/v1/turnos/estadisticas/resumen: ahora devuelve { ok: true, data: [ { especialidad, cantidad }, ... ] } en vez de romper.

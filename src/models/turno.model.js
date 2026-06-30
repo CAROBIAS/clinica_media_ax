@@ -112,6 +112,17 @@ class TurnoModel {
     return rows.length > 0 ? parseFloat(rows[0].valor_consulta) : null;
   }
 
+  async obtenerMedicoPorUsuarioId(usuarioId) {
+    const [rows] = await pool.execute(
+      `SELECT m.id_medico
+      FROM medicos m
+      JOIN usuarios u ON m.id_usuario = u.id_usuario
+      WHERE u.id_usuario = ? AND u.activo = 1`,
+      [usuarioId]
+    );
+    return rows.length > 0 ? rows[0].id_medico : null;
+  }
+
   async obtenerPacienteActivo(idPaciente) {
     const [rows] = await pool.execute(
       `SELECT p.id_paciente

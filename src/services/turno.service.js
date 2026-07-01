@@ -31,16 +31,7 @@ class TurnoService {
       throw err;
     }
 
-    let idObraSocial = data.id_obra_social;
-    if (!idObraSocial) {
-      const particular = await this.turnoModel.obtenerObraSocialParticular();
-      if (!particular) {
-        const err = new Error('No hay obra social particular configurada');
-        err.statusCode = 400;
-        throw err;
-      }
-      idObraSocial = particular;
-    }
+    const idObraSocial = data.id_obra_social || await this.turnoModel.obtenerObraSocialPaciente(data.id_paciente);
 
     const obra = await this.turnoModel.obtenerObraSocial(idObraSocial);
     if (!obra) {

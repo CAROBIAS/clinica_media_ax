@@ -19,12 +19,15 @@ import metricasRoutes from './src/routes/metricas.routes.js';
 import { runSeed } from './src/config/seed.js';
 import { runProcedures } from './src/config/procedures.js';
 
+import usuarioRoutes from './src/routes/usuario.routes.js';
+
 const app = express();
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 
 swaggerSetup(app);
 
@@ -50,6 +53,7 @@ app.use('/api/v1/especialidades', especialidadRoutes);
 app.use('/api/v1/medicos', medicoRoutes);
 app.use('/api/v1/turnos', turnosRoutes);
 app.use('/api/v1', obrasRoutes);
+app.use('/api/v1/usuarios', usuarioRoutes);
 
 app.use('/api/v2', pacientesRoutes);
 

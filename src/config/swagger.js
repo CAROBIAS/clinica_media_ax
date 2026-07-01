@@ -28,7 +28,8 @@ const options = {
     './src/routes/obrasSociales.routes.js',
     './src/routes/turnos.routes.js',
     './src/routes/pacientes.routes.js',
-    './src/routes/metricas.routes.js'
+    './src/routes/metricas.routes.js',
+    './src/routes/usuario.routes.js'
   ],
 };
 

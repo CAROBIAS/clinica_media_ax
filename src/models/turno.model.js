@@ -142,6 +142,14 @@ class TurnoModel {
     return rows.length > 0 ? rows[0] : null;
   }
 
+  async obtenerObraSocialPaciente(idPaciente) {
+    const [rows] = await pool.execute(
+      'SELECT id_obra_social FROM pacientes WHERE id_paciente = ?',
+      [idPaciente]
+    );
+    return rows.length > 0 ? rows[0].id_obra_social : null;
+  }
+
   async obtenerObraSocialParticular() {
     const [rows] = await pool.execute(
       'SELECT id_obra_social FROM obras_sociales WHERE es_particular = 1 AND activo = 1 LIMIT 1'

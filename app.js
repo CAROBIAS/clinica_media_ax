@@ -17,6 +17,7 @@ import pacientesRoutes from './src/routes/pacientes.routes.js';
 import metricasRoutes from './src/routes/metricas.routes.js';
 
 import { runSeed } from './src/config/seed.js';
+import { runProcedures } from './src/config/procedures.js';
 
 const app = express();
 
@@ -65,6 +66,7 @@ const PORT = process.env.PORT || 3000;
 async function start() {
   try {
     await testConnection();
+    await runProcedures(); 
     await runSeed();
     app.listen(PORT, () => {
       console.log(`Servidor en http://localhost:${PORT}`);

@@ -83,19 +83,19 @@ class TurnoService {
   }
 
   async marcarAtendido(id, idMedico) {
-  const turno = await this.turnoModel.findById(id);
-  if (!turno) {
-    const err = new Error('Turno no encontrado');
-    err.statusCode = 404;
-    throw err;
+    const turno = await this.turnoModel.findById(id);
+    if (!turno) {
+      const err = new Error('Turno no encontrado');
+      err.statusCode = 404;
+      throw err;
+    }
+    if (turno.id_medico !== idMedico) {
+      const err = new Error('No pertenece a este médico');
+      err.statusCode = 403;
+      throw err;
+    }
+    await this.turnoModel.marcarAtendido(id);
   }
-  if (turno.id_medico !== idMedico) {
-    const err = new Error('No pertenece a este médico');
-    err.statusCode = 403;
-    throw err;
-  }
-  await this.turnoModel.marcarAtendido(id);
-}
 
   async eliminarTurno(id) {
     const turno = await this.turnoModel.findById(id);
@@ -109,6 +109,10 @@ class TurnoService {
 
   async obtenerEstadisticas() {
     return await this.turnoModel.obtenerEstadisticas();
+  }
+
+  async obtenerIdMedicoPorUsuario(usuarioId) {
+    return await this.turnoModel.obtenerMedicoPorUsuarioId(usuarioId);
   }
 
   async validarCalculo(turnoId) {
